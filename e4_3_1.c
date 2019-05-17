@@ -3,9 +3,6 @@
 
 #define MAXOP 100
 #define NUMBER '0'
-#define SIN 's'
-#define EXP 'e'
-#define POW 'p'
 
 void push(double f);
 double pop(void);
@@ -42,6 +39,13 @@ main()
           push(pop() /op2);
         else
           printf("error div zero\n");
+      break;
+      case '%':
+        op2 = pop();
+        if (op2 != 0.0)
+          push((int) pop() % (int) op2);
+        else
+          printf("error mod zero\n");
         break;
       case '\n':
         printf(" %.8g\n", pop());
@@ -95,10 +99,18 @@ int getop(char s[])
   while((s[0] = c = getch())== ' ' || c == '\t' )
   ;
   s[1] = '\0';
-  if(!isdigit(c) && c != '.')
+  if(!isdigit(c) && c != '.' && c != '-')
     return c;
 
-  i = 0;
+    i = 0;
+  if( c == '-')
+    if( !isdigit(s[++i] = c = getch()))
+      return '-';
+    else{
+      while(isdigit(s[++i] = c = getch()))
+      ;
+    }
+
   if (isdigit(c))
     while(isdigit(s[++i] = c = getch()))
     ;

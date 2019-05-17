@@ -3,9 +3,6 @@
 
 #define MAXOP 100
 #define NUMBER '0'
-#define SIN 's'
-#define EXP 'e'
-#define POW 'p'
 
 void push(double f);
 double pop(void);
@@ -42,6 +39,13 @@ main()
           push(pop() /op2);
         else
           printf("error div zero\n");
+      break;
+      case '%':
+        op2 = pop();
+        if (op2 != 0.0)
+          push((int) pop() % (int) op2);
+        else
+          printf("error mod zero\n");
         break;
       case '\n':
         printf(" %.8g\n", pop());
@@ -70,18 +74,40 @@ void push(double f)
 }
 
 
-
-
-
-
-
 double pop(void)
 {
   if(sp==0)
     printf("stack no item\n");
   else
     return val[--sp];
+}
 
+
+double top(void)
+{
+  if(sp==0)
+    printf("stack no item\n");
+  else
+    return val[sp-1];
+}
+
+void swap(void)
+{
+
+  if(sp<2)
+    printf("stack less then 2 item\n");
+  else
+  {
+    double tmp;
+    tmp = val[sp-1];
+    val[sp-1] = val[sp-2];
+    val[sp-2] = tmp;
+  }
+}
+
+void clear(void)
+{
+  sp = 0;
 }
 
 #include<ctype.h>
@@ -95,10 +121,18 @@ int getop(char s[])
   while((s[0] = c = getch())== ' ' || c == '\t' )
   ;
   s[1] = '\0';
-  if(!isdigit(c) && c != '.')
+  if(!isdigit(c) && c != '.' && c != '-')
     return c;
 
-  i = 0;
+    i = 0;
+  if( c == '-')
+    if( !isdigit(s[++i] = c = getch()))
+      return '-';
+    else{
+      while(isdigit(s[++i] = c = getch()))
+      ;
+    }
+
   if (isdigit(c))
     while(isdigit(s[++i] = c = getch()))
     ;
@@ -113,7 +147,7 @@ int getop(char s[])
 
 #define BUFSIZE 100
 
-char buf[BUFSIZE];
+int buf[BUFSIZE];
 int bufp = 0;
 
 int getch(void)
@@ -129,4 +163,11 @@ void ungetch(int c)
   {
     buf[bufp++] = c;
   }
+}
+
+void ungets( char s[])
+{
+  int j;
+  for(j = strlen(s) -1; j>=0; j--)
+    ungetch(s[j]);
 }
