@@ -4,21 +4,21 @@
 int getch(void);
 void ungetch(int c);
 
-int getint( int *pn);
+int getfloat( float *pn);
 
 main()
 {
-  int x;
-  int *pn = &x;
-  getint(pn);
+  float x;
+  float *pn = &x;
+  getfloat(pn);
 
-  printf("%d\n", x);
+  printf("%f\n", x);
 }
 
 
-int getint(int  *pn)
+int getfloat(float  *pn)
 {
-  int sign,c;
+  int sign, c, pow=1;
 
   while( isspace(c = getch()))
     ;
@@ -33,11 +33,31 @@ int getint(int  *pn)
   sign = (c == '-') ? -1 : 1;
   if (c == '+' || c == '-')
     c = getch();
+
+  if(!isdigit(c))
+  {
+    ungetch(c);
+    return 0;
+  }
+
   for(*pn = 0; isdigit(c);c = getch())
   {
     *pn = *pn*10 + c - '0';
   }
-  *pn = *pn * sign;
+
+  if(c == '.')
+    c = getch();
+
+  for(; isdigit(c);c = getch())
+  {
+    *pn = *pn*10 + c - '0';
+    pow *=10;
+  }
+
+
+
+  *pn = *pn * sign/pow;
+
   if(c != EOF)
   {
     ungetch(c);

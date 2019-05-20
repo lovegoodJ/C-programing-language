@@ -1,0 +1,81 @@
+#include <stdio.h>
+
+
+int not_leap[13] =
+    {0,31,28,31,30,31,30,31,31,30,31,30,31};
+
+int leap_row[13]=
+    {0,31,29,31,30,31,30,31,31,30,31,30,31};
+
+int *daytab[2]={
+    not_leap,
+    leap_row
+};
+
+
+int day_of_year(int year, int month, int day);
+
+void month_day(int year, int yearday, int *pmonth, int *pday);
+
+int main()
+{
+  int year = 1988;
+  int yearday = 60;
+
+  int month = 2;
+  int day = 29;
+
+  int yd = day_of_year(year, month, day);
+
+  int m, d;
+  month_day(year, yearday, &m, &d);
+
+  printf("yd %d\n", yd);
+  printf(" m %d d %d \n", m, d);
+}
+
+
+
+int day_of_year(int year, int month, int day)
+{
+
+  if(month<1 || month >12)
+  {
+    return -1;
+  }
+
+
+  int leap;
+  leap = year%4 ==0 && year%100 !=0 || year%400 ==0;
+
+  if(day<1 || day > *(*(daytab +leap) +month))
+  {
+    return -1;
+  }
+
+  int m;
+  for(m = 1; m<month; m++)
+  {
+    day += *(*(daytab +leap) +month);
+  }
+  return day;
+
+}
+
+
+void month_day(int year, int yearday, int *m, int *d)
+{
+  int leap;
+  leap = year%4 ==0 && year%100 !=0 || year%400 ==0;
+
+int   maxd = (leap ==0) ? 365 : 366;
+  if(yearday<0 || yearday > maxd)
+  {
+     printf("Error\n");
+  }
+  for(*m=1; yearday> *(*(daytab +leap) + *m); (*m)++ )
+  {
+    yearday -= *(*(daytab +leap) + *m);
+  }
+  *d = yearday;
+}
