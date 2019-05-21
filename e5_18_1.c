@@ -16,6 +16,11 @@ char name[MAXTOKEN];
 char datatype[MAXTOKEN];
 char out[1000];
 
+int error =0;
+int prevtoken = 0;
+
+
+
 int main()
 {
   while(gettoken() != EOF)
@@ -57,12 +62,13 @@ void dirdcl(void)
   if (tokentype == '('){
     dcl();
     if (tokentype != ')')
-      printf("Error massing )\n");
+      tokenerror("Error massing )\n");
   }else if( tokentype == NAME){
     strcpy(name, token);
     printf("111111\n");
   }else{
-    printf("Error, expect name or (dcl)\n");
+    tokenerror("Error, expect name or (dcl)\n");
+
   }
 
   while( (type = gettoken()) == PARENS || type == BRACKETS)
@@ -75,6 +81,25 @@ void dirdcl(void)
       strcat(out, " of");
     }
   }
+
+  if(error ==1)
+  {
+    error =0;
+    prevtoken =1;
+    dcl();
+  }
+
+}
+
+
+// ##########################################################
+
+
+
+void tokenerror(char *s)
+{
+  printf("%s",s);
+  error =1;
 }
 
 int gettoken(void)
@@ -82,6 +107,12 @@ int gettoken(void)
   int c, getch(void);
   void ungetch(int);
   char *p = token;
+
+  if(prevtoken ==1)
+  {
+    prevtoken =0;
+    return tokentype;
+  }
 
   // printf("1111111111111111\n");
   while((c= getch()) ==' ' || c == '\t' )
