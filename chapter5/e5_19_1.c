@@ -16,6 +16,8 @@ char name[MAXTOKEN];
 char datatype[MAXTOKEN];
 char out[1000];
 
+int prevtoken=0;
+
 int main()
 {
   int type;
@@ -29,17 +31,19 @@ int main()
     while(gettoken() != '\n'){
       if(tokentype == PARENS || tokentype == BRACKETS){
         strcat(out, token);
-      }else if(tokentype == '*'){
         gettoken();
-        if(tokentype == PARENS || tokentype == BRACKETS)
+        if(tokentype == '*')
         {
-          sprintf(temp, "*%s",out);
+          sprintf(temp,"*%s",out);
           strcpy(out,temp);
+        }else{
+          prevtoken =1;
         }
-        else{
+      }else if(tokentype == '*'){
+
           sprintf(temp,"(*%s)",out);
-          strcpy(out,tmep);
-        }
+          strcpy(out,temp);
+
       }else if(tokentype == NAME){
         sprintf(temp, " %s %s", token, out);
         strcpy(out, temp);
@@ -65,6 +69,11 @@ int gettoken(void)
   void ungetch(int);
   char *p = token;
 
+  if(prevtoken ==1)
+  {
+    prevtoken =0;
+    return tokentype;
+  }
   // printf("1111111111111111\n");
   while((c= getch()) ==' ' || c == '\t' )
     ;
