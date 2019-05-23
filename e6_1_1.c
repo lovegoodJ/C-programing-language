@@ -57,7 +57,7 @@ int main(){
 
     // printf(" 11111\n");
     // printf("%s\n", word);
-    if(isalpha(word[0]))
+    if(isalpha(word[0]) || word[0] == '_')
       if( (n = binsearch(word, keytab, NKEYS))>=0 )
         keytab[n].count++;
   }
@@ -112,7 +112,7 @@ int getword(char * word, int lim)
     *(w++) = c;
   }
 
-  if(!isalpha(c))
+  if(!isalpha(c) && c != '_')
   {
     *w = '\0';
     return c;
@@ -122,7 +122,7 @@ int getword(char * word, int lim)
 
   for (; --lim >0; w++)
   {
-    if(! isalnum( *w = getch()))
+    if(! isalnum( *w = getch()) && *w != '_')
     {
       ungetch(*w);
       break;

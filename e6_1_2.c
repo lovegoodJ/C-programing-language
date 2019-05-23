@@ -42,7 +42,7 @@ struct key {
 
 #define MAXWORD 100
 int getword(char *, int);
-int binsearch(char *, struct key *, int);
+struct key * binsearch(char *, struct key *, int);
 
 #define NKEYS (sizeof keytab / sizeof keytab[0])
 
@@ -50,39 +50,39 @@ int main(){
 
 
   char word[MAXWORD];
-  int n, i;
+  struct key * n, *i;
 
   while( getword(word, MAXWORD) != EOF)
   {
 
     // printf(" 11111\n");
     // printf("%s\n", word);
-    if(isalpha(word[0]))
-      if( (n = binsearch(word, keytab, NKEYS))>=0 )
-        keytab[n].count++;
+    if(isalpha(word[0]) || word[0] == '_')
+      if( (n = binsearch(word, keytab, NKEYS))!= NULL )
+        n->count++;
   }
 
 
-  for(i = 0; i<NKEYS; i++){
-    if(keytab[i].count >0)
+  for(i = keytab; i< keytab + NKEYS; i++){
+    if(i->count >0)
     {
-      printf(" %d %s \n", keytab[i].count, keytab[i].word);
+      printf(" %d %s \n", i->count, i->word);
     }
   }
 
   return 0;
 }
 
-int binsearch(char * word, struct key * keytab, int nkeys)
+struct key * binsearch(char * word, struct key * keytab, int nkeys)
 {
-  int i, j, mid;
-  i = 0;
-  j = nkeys -1;
+  struct key * i, *j, *mid;
+  i = keytab;
+  j = keytab + (nkeys -1);
   int cp;
 
   while(i<=j){
-    mid = (i+j)/2;
-    if ((cp = strcmp(word, keytab[mid].word)) >0)
+    mid = i + (j-i)/2;
+    if ((cp = strcmp(word, mid->word)) >0)
     {
       i = mid + 1;
     } else if (cp <0) {
@@ -92,7 +92,7 @@ int binsearch(char * word, struct key * keytab, int nkeys)
     }
   }
 
-  return -1;
+  return NULL;
 }
 
 
@@ -112,7 +112,7 @@ int getword(char * word, int lim)
     *(w++) = c;
   }
 
-  if(!isalpha(c))
+  if(!isalpha(c) && c != '_')
   {
     *w = '\0';
     return c;
@@ -122,7 +122,7 @@ int getword(char * word, int lim)
 
   for (; --lim >0; w++)
   {
-    if(! isalnum( *w = getch()))
+    if(! isalnum( *w = getch()) && *w != '_')
     {
       ungetch(*w);
       break;
