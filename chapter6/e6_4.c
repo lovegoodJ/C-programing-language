@@ -17,8 +17,8 @@ void treeprint(struct tnode *root);
 
 int getword(char *word, int lim);
 
-void treesort(struct tnode *sorted, struct tnode *root);
-void addsortedtree(struct tnode *root, struct tnode *nt);
+struct tnode  *treesort(struct tnode *sorted, struct tnode *root);
+struct tnode *addsortedtree(struct tnode *root, struct tnode *nt);
 
 int main()
 {
@@ -42,28 +42,35 @@ int main()
 
   treeprint(root);
   printf("1111111\n");
-  treesort(sorted, root);
+  sorted = treesort(sorted, root);
   printf("2222222\n");
   treeprint(sorted);
 }
 
-void treesort(struct tnode *sorted, struct tnode *root){
+struct tnode  *treesort(struct tnode *sorted, struct tnode *root){
   struct tnode *p = root;
-  struct tnode *left = p->left;
-  struct tnode *right = p->right;
-  p->left = NULL;
-  p->right = NULL;
+
 
 
     if(p != NULL)
     {
-      treesort(p, left);
-      addsortedtree(sorted, p );
-      treesort(p, right);
+      struct tnode *left = p->left;
+      struct tnode *right = p->right;
+      p->left = NULL;
+      p->right = NULL;
+      printf( "treesort %s\n", p->word);
+      sorted = addsortedtree(sorted, p );
+            printf( "treesort %s\n", p->word);
+       treesort(sorted, left);
+
+       treesort(sorted, right);
+      return sorted;
+    } else{
+      return sorted;
     }
 }
 
-void addsortedtree(struct tnode *root, struct tnode *tn){
+struct tnode *addsortedtree(struct tnode *root, struct tnode *tn){
    struct tnode *p = root;
    int n;
 
@@ -73,31 +80,39 @@ void addsortedtree(struct tnode *root, struct tnode *tn){
    {
      if (tn == NULL)
      {
-       return ;
+       return NULL;
      } else{
        p = tn;
+
      }
   } else if ( tn == NULL){
-    return ;
+    ;
   } else if( ( n = p->count - tn->count) >= 0)
   {
+
     if(p->left == NULL)
     {
       p->left = tn;
+      p=tn;
     }else{
-      addsortedtree(p->left, tn);
+          printf("left\n");
+      p = addsortedtree(p->left, tn);
     }
 
   } else{
+
     if(p->right == NULL)
     {
       p->right = tn;
+      p= tn;
     }else {
-      addsortedtree(p->right, tn);
+      printf("right\n");
+      p = addsortedtree(p->right, tn);
     }
 
   }
-
+  printf("add %s\n",p->word);
+    return p;
 }
 
 
