@@ -2,65 +2,106 @@
 #include <string.h>
 #include <ctype.h>
 
-
-struct line{
-  int linenum;
-  struct line *next;
-};
-
-
 struct tnode {
   char * word;
-  struct line *l;
+  int count;
   struct tnode *left;
   struct tnode *right;
 };
 
-char * common[] ={
-  "and",
-  "is",
-  "the"
-};
-
 #define MAXWORD 100
 
-struct tnode *addtree(struct tnode *root, char *word, int linenum);
-struct line *addline(struct line *l, int linenum);
+struct tnode *addtree(struct tnode *root, char *word);
 
 void treeprint(struct tnode *root);
 
 int getword(char *word, int lim);
 
+void treesort(struct tnode *sorted, struct tnode *root);
+void addsortedtree(struct tnode *root, struct tnode *nt);
 
 int main()
 {
   struct tnode *root = NULL;
+  struct tnode *sorted = NULL;
   char word[MAXWORD];
-  int linenum = 1;
 
-  while( getword(word, MAXWORD) !=EOF){
-    if(word[0]=='\n')
-    {
-       printf("linenum %d\n", linenum);
-            linenum++;
-    }
+  while( getword(word, MAXWORD) >0){
 
     if (isalpha(word[0]))
     {
       if(root == NULL)
       {
-      root = addtree(root, word,linenum);
+                root = addtree(root, word);
       }else{
-        addtree(root, word,linenum);
+        addtree(root, word);
       }
-       // treeprint(root);
+
     }
   }
 
   treeprint(root);
+  printf("1111111\n");
+  treesort(sorted, root);
+  printf("2222222\n");
+  treeprint(sorted);
 }
 
-struct tnode *addtree(struct tnode *root, char *word, int linenum){
+void treesort(struct tnode *sorted, struct tnode *root){
+  struct tnode *p = root;
+  struct tnode *left = p->left;
+  struct tnode *right = p->right;
+  p->left = NULL;
+  p->right = NULL;
+
+
+    if(p != NULL)
+    {
+      treesort(p, left);
+      addsortedtree(sorted, p );
+      treesort(p, right);
+    }
+}
+
+void addsortedtree(struct tnode *root, struct tnode *tn){
+   struct tnode *p = root;
+   int n;
+
+
+
+   if (p== NULL)
+   {
+     if (tn == NULL)
+     {
+       return ;
+     } else{
+       p = tn;
+     }
+  } else if ( tn == NULL){
+    return ;
+  } else if( ( n = p->count - tn->count) >= 0)
+  {
+    if(p->left == NULL)
+    {
+      p->left = tn;
+    }else{
+      addsortedtree(p->left, tn);
+    }
+
+  } else{
+    if(p->right == NULL)
+    {
+      p->right = tn;
+    }else {
+      addsortedtree(p->right, tn);
+    }
+
+  }
+
+}
+
+
+struct tnode *addtree(struct tnode *root, char *word){
    struct tnode *p = root;
    int n;
 
@@ -71,82 +112,36 @@ struct tnode *addtree(struct tnode *root, char *word, int linenum){
    {
     p = talloc();
     p->word = mystrdup(word);
-    p->l = addline(p->l, linenum);
+    p->count = 1;
     p->left = NULL;
     p->right = NULL;
     return p;
   } else if ( (n = strcmp(p->word, word))==0){
-    addline(p->l,linenum);
+    p->count++;
     return p;
   } else if(n<0)
   {
     if(p->right == NULL)
-    {
-      p->right = addtree(p->right, word, linenum);
-      return p->right;
-    }
-
+      p->right = addtree(p->right, word);
     else
-      addtree(p->right, word,linenum);
+      addtree(p->right, word);
 
   } else{
     if(p->left == NULL)
-    {
-      p->left = addtree(p->left, word, linenum);
-      return p->left;
-    }
-
+      p->left = addtree(p->left, word);
     else
-      addtree(p->left,word, linenum);
+      addtree(p->left,word);
   }
-
-}
-
-struct line* addline(struct line * l, int linenum)
-{
-  struct line * p = l;
-  struct line *lalloc(void);
-
-  if(p ==NULL)
-  {
-    p = lalloc();
-    p->next = NULL;
-    p->linenum = linenum;
-    return p;
-  }
-  while(1){
-    if(p->linenum == linenum)
-      return p;
-    else{
-      if(p->next != NULL)
-        p = p->next;
-      else{
-        p->next = lalloc();
-        p = p->next;
-        p->next = NULL;
-        p->linenum = linenum;
-        return p;
-      }
-    }
-  }
-
 
 }
 
 void treeprint(struct tnode *p){
 
 
-
   if(p != NULL)
   {
-    struct line *l = p->l;
     treeprint(p->left);
-    printf(" %s", p->word);
-    while(l!=NULL){
-      printf(" %d", l->linenum);
-      l = l->next;
-    }
-    printf(" \n");
+    printf(" %d, %s\n", p->count, p->word);
     treeprint(p->right);
   }
 
@@ -158,10 +153,6 @@ void treeprint(struct tnode *p){
 
 struct tnode *talloc(void){
   return (struct tnode *) malloc(sizeof(struct tnode));
-}
-
-struct line * lalloc(void){
-  return (struct line *) malloc(sizeof(struct line));
 }
 
 char *mystrdup(char *s)
@@ -192,7 +183,7 @@ int getword(char * word, int lim)
   int getch();
   void ungetch(int c);
 
-  while( isspace(c = getch()) && c !='\n')
+  while( isspace(c = getch()))
     ;
 
 
