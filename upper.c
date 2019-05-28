@@ -5,12 +5,13 @@
 int main(int argc, char * argv[])
 {
   int c;
-  if(strcmp(argv[0], "lower")==0)
+  printf("%s\n",argv[0]);
+  if(strstr(argv[0], "lower")!=NULL)
   {
     while( (c=getchar()) !=EOF){
       putchar(tolower(c));
     }
-  } else if( strcmp(argv[0], "upper")==0){
+  } else if( strstr(argv[0], "upper")!=NULL){
     while( (c=getchar()) !=EOF){
       putchar(toupper(c));
   }
